@@ -63,7 +63,7 @@ select.fi{appearance:none;-webkit-appearance:none}
 </div>
 
 <div style="margin-top:20px;text-align:center">
-  <a class="link" href="Cs_Labour_Admin_V3.html">↗ Go to Admin Portal</a>
+  <a class="link" href="admin.html">↗ Go to Admin Portal</a>
 </div>
 
 <script>
@@ -157,7 +157,7 @@ function updateStatusUI(status,name,role){
     icon.textContent='✅';
     title.textContent='Approved!';
     title.style.color='#22c55e';
-    text.innerHTML='<b>'+name+'</b> ('+role+')<br>You are approved! <a class="link" href="Cs_Labour_Admin_V3.html">Open Admin Portal →</a>';
+    text.innerHTML='<b>'+name+'</b> ('+role+')<br>You are approved! <a class="link" href="admin.html">Open Admin Portal →</a>';
   }else if(status==='blocked'){
     icon.textContent='🚫';
     title.textContent='Blocked';
@@ -180,7 +180,7 @@ function checkStatus(){
     updateStatusUI(data.status,data.name||info.name,data.role||info.role);
     if(data.status==='approved'){
       msg.className='msg msg-ok';msg.textContent='✅ Approved! Redirecting...';
-      setTimeout(function(){window.location.href='Cs_Labour_Admin_V3.html'},2000);
+      setTimeout(function(){window.location.href='admin.html'},2000);
     }else if(data.status==='pending'){
       msg.className='msg msg-wait';msg.textContent='Still pending...';
     }else{

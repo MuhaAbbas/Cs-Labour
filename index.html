@@ -400,10 +400,7 @@ var App = {
   /* ── 1: Name list + Device Auto-Login ── */
   init: function() {
     var self = this;
-    // Show loading while fetching staff from Firebase
     $('nms').innerHTML = '<div style="text-align:center;padding:30px;color:#8b90a0">⏳ لوڈ ہو رہا ہے...</div>';
-
-    // Load staff list dynamically from Firebase (field map: name→n, code→c, designation→r, phone→ph)
     var x = new XMLHttpRequest();
     x.open('GET', FB_URL + '/labour_staff.json');
     x.onload = function() {
@@ -414,47 +411,39 @@ var App = {
           Object.keys(data).forEach(function(k) {
             var s = data[k];
             if (s && s.status !== 'inactive' && s.status !== 'deleted') {
-              PPL.push({ n: s.name || '—', c: s.code || k, r: s.designation || '—', ph: s.phone || '', _fbKey: k });
+              PPL.push({ n: s.name||'—', c: s.code||k, r: s.designation||'—', ph: s.phone||'', _fbKey: k });
             }
           });
-          // Sort by code
-          PPL.sort(function(a, b) { return (a.c || '').localeCompare(b.c || ''); });
+          PPL.sort(function(a,b){ return (a.c||'').localeCompare(b.c||''); });
         }
-      } catch(e) { log('Staff load parse error: ' + e); }
-
+      } catch(e) { log('Staff load error: '+e); }
       _pplLoaded = true;
       self._initAfterLoad();
     };
-    x.onerror = function() {
-      log('Staff load network error — using empty list');
-      _pplLoaded = true;
-      self._initAfterLoad();
-    };
+    x.onerror = function(){ _pplLoaded=true; self._initAfterLoad(); };
     x.send();
   },
 
   _initAfterLoad: function() {
-    // Check if device already registered
     var devId = localStorage.getItem('cs_labour_dev');
     var devCode = localStorage.getItem('cs_labour_code');
     if (devId && devCode) {
-      var match = PPL.find(function(p) { return p.c === devCode; });
+      var match = PPL.find(function(p){ return p.c === devCode; });
       if (match) {
         _who = match;
-        log('Auto-login: ' + match.n + ' (' + match.c + ') dev=' + devId);
-        toast('👋 ' + match.n, 'ok');
+        log('Auto-login: '+match.n+' ('+match.c+') dev='+devId);
+        toast('👋 '+match.n,'ok');
         this.toSelfie();
         return;
       }
     }
-    // Show name list
     if (!PPL.length) {
       $('nms').innerHTML = '<div style="text-align:center;padding:30px;color:#dc2626">⚠️ کوئی ملازم نہیں ملا۔ ایڈمن سے رابطہ کریں۔</div>';
       return;
     }
     var h = '';
-    PPL.forEach(function(p, i) {
-      h += '<div class="nm-b" onclick="App.pick(' + i + ')" id="nm' + i + '"><span>' + p.n + '</span><span class="nm-s">' + p.r + ' · ' + p.ph + '</span></div>';
+    PPL.forEach(function(p,i){
+      h += '<div class="nm-b" onclick="App.pick('+i+')" id="nm'+i+'"><span>'+p.n+'</span><span class="nm-s">'+p.r+' · '+p.ph+'</span></div>';
     });
     $('nms').innerHTML = h;
   },
@@ -472,7 +461,6 @@ var App = {
     }
     localStorage.setItem('cs_labour_code', _who.c);
     log('Device bound: ' + _who.n + ' → ' + devId);
-    // Write deviceId back to Firebase so admin can see which device is bound
     if (_who._fbKey) {
       var xd = new XMLHttpRequest();
       xd.open('PATCH', FB_URL + '/labour_staff/' + _who._fbKey + '.json');
